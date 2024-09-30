@@ -13,18 +13,18 @@
 
 int part1();
 int part2();
-// int part3();
+int part3();
 
 
 int main(int argc, char *argv[])
 {
-  int rc = 0;
   struct sqlca sqlca;
 
   EXEC SQL CONNECT TO SAMPLE;
 
-  rc = part1();
-  rc = part2();
+  part1();
+  part2();
+  part3();
 
   EXEC SQL CONNECT RESET;
 
@@ -114,6 +114,49 @@ int part2() {
   }
 
   EXEC SQL CLOSE execCursorTwo;
+
+  printf("\n");
+  return 0;
+}
+
+// display joined employee and dept info
+int part3() {
+  printf("\n3. Display employee and department info.\n\n");
+
+  struct sqlca sqlca;
+
+  EXEC SQL BEGIN DECLARE SECTION;
+  char firstName[64];
+  char lastName[64];
+  char deptNo[64];
+  char deptName[64];
+  char mgrNo[64];
+  int rowCount;
+
+  EXEC SQL END DECLARE SECTION;
+
+  EXEC SQL SELECT COUNT(1) INTO :rowCount FROM EMPLOYEE;
+
+  EXEC SQL DECLARE execCursorThree CURSOR FOR
+    SELECT COALESCE(firstNme, '-'),
+           COALESCE(lastName, '-'),
+           COALESCE(deptNo, '-'),
+           COALESCE(deptName, '-'),
+           COALESCE(mgrNo, '-') FROM EMPLOYEE
+    LEFT OUTER JOIN DEPARTMENT ON workdept = deptno;
+  EXEC SQL OPEN execCursorThree;
+
+  char tableFormat[50];
+  strcpy(tableFormat, "| %15s | %15s | %8s | %30s | %8s |\n");
+  printf(tableFormat, "First Name", "Last Name", "Dept No", "Dept Name", "Mgr No");
+  printf(tableFormat, "----------", "---------", "-------", "---------", "------");
+  while (rowCount-- > 0) {
+    EXEC SQL FETCH execCursorThree INTO
+      :firstName, :lastName, :deptNo, :deptName, :mgrNo;
+    printf(tableFormat, firstName, lastName, deptNo, deptName, mgrNo);
+  }
+
+  EXEC SQL CLOSE execCursorThree;
 
   printf("\n");
   return 0;
