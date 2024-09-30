@@ -12,7 +12,7 @@
 // EXEC SQL END DECLARE SECTION;
 
 int part1();
-// int part2();
+int part2();
 // int part3();
 
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
   EXEC SQL CONNECT TO SAMPLE;
 
   rc = part1();
-  // rc = part2();
+  rc = part2();
 
   EXEC SQL CONNECT RESET;
 
@@ -68,6 +68,52 @@ int part1() {
   }
 
   EXEC SQL CLOSE execCursorOne;
+
+  printf("\n");
+  return 0;
+}
+
+// display the employee table
+int part2() {
+  printf("\n2. Display the `employee` table.\n\n");
+
+  struct sqlca sqlca;
+
+  EXEC SQL BEGIN DECLARE SECTION;
+  char firstName[64];
+  char midInitial;
+  char lastName[64];
+  char sex;
+  float bonus;
+  float commission;
+  float salary;
+  int rowCount;
+  EXEC SQL END DECLARE SECTION;
+
+  EXEC SQL SELECT COUNT(1) INTO :rowCount FROM EMPLOYEE;
+
+  EXEC SQL DECLARE execCursorTwo CURSOR FOR
+    SELECT COALESCE(firstNme, '-'),
+           COALESCE(midInit, '-'),
+           COALESCE(lastName, '-'),
+           COALESCE(sex, '-'),
+           COALESCE(bonus, '-'),
+           COALESCE(comm, '-'),
+           COALESCE(salary, '-') FROM EMPLOYEE;
+  EXEC SQL OPEN execCursorTwo;
+
+  char tableFormat[50];
+  strcpy(tableFormat, "| %12s | %c | %12s | %c | %.2f | %.2f | %.2f |\n");
+  printf("| %12s | %8s | %12s | %5s | %10s | %10s | %10s |\n",
+      "First Name", "Mid Init", "Last Name", "Sex", "Bonus", "Commission", "Salary");
+  printf(tableFormat, "----------", "--------", "---------", "---", "-----", "----------", "------");
+  while (rowCount-- > 0) {
+    EXEC SQL FETCH execCursorTwo INTO
+      :firstName, :midInitial, :lastName, :sex, :bonus, :commission, :salary;
+    printf(tableFormat, firstName, midInitial, lastName, sex, bonus, commission, salary);
+  }
+
+  EXEC SQL CLOSE execCursorTwo;
 
   printf("\n");
   return 0;
