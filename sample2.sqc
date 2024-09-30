@@ -4,16 +4,17 @@
 #include <sqlenv.h>
 #include <sqlutil.h>
 
-EXEC SQL BEGIN DECLARE SECTION;
-  char tableName[128];
-  char schemaName[128];
-  char columnName[20];
-  char dataType[14];
-  sqlint32 dataLength;
-  short dataScale;
-  char user[129];
-  char pswd[15];
-EXEC SQL END DECLARE SECTION;
+// FIXME: unsure as to why SQLSTATE doesn't work.
+// #define NO_MORE_TUPLES !(strcmp(SQLSTATE, "02000"))
+
+// EXEC SQL BEGIN DECLARE SECTION;
+// char SQLSTATE[6];
+// EXEC SQL END DECLARE SECTION;
+
+int part1();
+// int part2();
+// int part3();
+
 
 int main(int argc, char *argv[])
 {
@@ -22,8 +23,51 @@ int main(int argc, char *argv[])
 
   EXEC SQL CONNECT TO SAMPLE;
 
-  /* disconnect from the database */
+  rc = part1();
+  // rc = part2();
+
   EXEC SQL CONNECT RESET;
+
+  printf("\n");
+  return 0;
+}
+
+// display the department table
+int part1() {
+  printf("\n1. Display the `department` table.\n\n");
+
+  struct sqlca sqlca;
+
+  EXEC SQL BEGIN DECLARE SECTION;
+  char deptNo[64];
+  char deptName[64];
+  char mgrNo[64];
+  char ADMRDept[64];
+  char location[64];
+  int rowCount;
+  EXEC SQL END DECLARE SECTION;
+
+  EXEC SQL SELECT COUNT(1) INTO :rowCount FROM DEPARTMENT;
+
+  EXEC SQL DECLARE execCursorOne CURSOR FOR
+    SELECT COALESCE(deptNo, '-'),
+           COALESCE(deptName, '-'),
+           COALESCE(mgrNo, '-'),
+           COALESCE(ADMRDept, '-'),
+           COALESCE(location, '-') FROM department;
+  EXEC SQL OPEN execCursorOne;
+
+  char tableFormat[50];
+  strcpy(tableFormat, "| %8s | %30s | %8s | %10s | %10s |\n");
+  printf(tableFormat, "DeptNo", "DeptName", "MgrNo", "ADMRDept", "Location");
+  printf(tableFormat, "------", "--------", "-----", "--------", "--------");
+  while (rowCount-- > 0) {
+    EXEC SQL FETCH execCursorOne INTO
+      :deptNo, :deptName, :mgrNo, :ADMRDept, :location;
+    printf(tableFormat, deptNo, deptName, mgrNo, ADMRDept, location);
+  }
+
+  EXEC SQL CLOSE execCursorOne;
 
   printf("\n");
   return 0;

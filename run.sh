@@ -1,3 +1,5 @@
+#! /bin/bash
+set -e
 
 sudo docker cp ./sample2.sqc mydb2:/database/config/db2inst1/workspace/sample2.sqc
 
@@ -18,7 +20,8 @@ echo Compiled
 gcc -o sample2 sample2.o -L../sqllib/lib -ldb2
 echo Linked and generated executable
 
+echo Running...
 ./sample2
-echo Execution complete
+echo Run complete.
 
 EOF
