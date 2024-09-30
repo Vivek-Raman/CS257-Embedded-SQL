@@ -1,0 +1,149 @@
+wannab@pop-os:~/Documents/Code/CS257-HW3$ sudo su
+root@pop-os:/home/wannab/Documents/Code/CS257-HW3# docker ps
+CONTAINER ID   IMAGE        COMMAND                  CREATED       STATUS       PORTS                                                                               NAMES
+2ebcc1c6fbf6   ibmcom/db2   "/var/db2_setup/lib/…"   3 hours ago   Up 3 hours   22/tcp, 55000/tcp, 60006-60007/tcp, 0.0.0.0:50000->50000/tcp, :::50000->50000/tcp   mydb2
+root@pop-os:/home/wannab/Documents/Code/CS257-HW3# docker cp ./sample2.sqc mydb2:/database/config/db2inst1/workspace/sample2.sqc
+Successfully copied 6.14kB to mydb2:/database/config/db2inst1/workspace/sample2.sqc
+root@pop-os:/home/wannab/Documents/Code/CS257-HW3# docker exec -it mydb2 /bin/bash -c 'su - db2inst1'
+Last login: Mon Sep 30 05:40:30 UTC 2024
+[db2inst1@2ebcc1c6fbf6 ~]$ cd workspace
+[db2inst1@2ebcc1c6fbf6 workspace]$ db2 connect to sample
+
+   Database Connection Information
+
+ Database server        = DB2/LINUXX8664 11.5.8.0
+ SQL authorization ID   = DB2INST1
+ Local database alias   = SAMPLE
+
+[db2inst1@2ebcc1c6fbf6 workspace]$ db2 prep sample2.sqc
+
+LINE    MESSAGES FOR sample2.sqc
+------  --------------------------------------------------------------------
+        SQL0060W  The "C" precompiler is in progress.
+        SQL0091W  Precompilation or binding was ended with "0"
+                  errors and "0" warnings.
+[db2inst1@2ebcc1c6fbf6 workspace]$ gcc -I../sqllib/include -c sample2.c
+[db2inst1@2ebcc1c6fbf6 workspace]$ gcc -o sample2 sample2.o -L../sqllib/lib -ldb2
+[db2inst1@2ebcc1c6fbf6 workspace]$ ./sample2
+
+1. Display the `department` table.
+
+|   DeptNo |                       DeptName |    MgrNo |   ADMRDept |   Location |
+|   ------ |                       -------- |    ----- |   -------- |   -------- |
+|      A00 |   SPIFFY COMPUTER SERVICE DIV. |   000010 |        A00 |          - |
+|      B01 |                       PLANNING |   000020 |        A00 |          - |
+|      C01 |             INFORMATION CENTER |   000030 |        A00 |          - |
+|      D01 |             DEVELOPMENT CENTER |        - |        A00 |          - |
+|      D11 |          MANUFACTURING SYSTEMS |   000060 |        D01 |          - |
+|      D21 |         ADMINISTRATION SYSTEMS |   000070 |        D01 |          - |
+|      E01 |               SUPPORT SERVICES |   000050 |        A00 |          - |
+|      E11 |                     OPERATIONS |   000090 |        E01 |          - |
+|      E21 |               SOFTWARE SUPPORT |   000100 |        E01 |          - |
+|      F22 |               BRANCH OFFICE F2 |        - |        E01 |          - |
+|      G22 |               BRANCH OFFICE G2 |        - |        E01 |          - |
+|      H22 |               BRANCH OFFICE H2 |        - |        E01 |          - |
+|      I22 |               BRANCH OFFICE I2 |        - |        E01 |          - |
+|      J22 |               BRANCH OFFICE J2 |        - |        E01 |          - |
+
+
+2. Display the `employee` table.
+
+|   First Name | Mid Init |    Last Name |   Sex |      Bonus | Commission |     Salary |
+|   ---------- | % |    --------- | � | 0.00 | 0.00 | 0.00 |
+|    CHRISTINE | I |         HAAS | F | 1000.00 | 4220.00 | 152750.00 |
+|      MICHAEL | L |     THOMPSON | M | 800.00 | 3300.00 | 94250.00 |
+|        SALLY | A |         KWAN | F | 800.00 | 3060.00 | 98250.00 |
+|         JOHN | B |        GEYER | M | 800.00 | 3214.00 | 80175.00 |
+|       IRVING | F |        STERN | M | 500.00 | 2580.00 | 72250.00 |
+|          EVA | D |      PULASKI | F | 700.00 | 2893.00 | 96170.00 |
+|       EILEEN | W |    HENDERSON | F | 600.00 | 2380.00 | 89750.00 |
+|     THEODORE | Q |      SPENSER | M | 500.00 | 2092.00 | 86150.00 |
+|     VINCENZO | G |    LUCCHESSI | M | 900.00 | 3720.00 | 66500.00 |
+|         SEAN |   |    O'CONNELL | M | 600.00 | 2340.00 | 49250.00 |
+|      DELORES | M |     QUINTANA | F | 500.00 | 1904.00 | 73800.00 |
+|      HEATHER | A |     NICHOLLS | F | 600.00 | 2274.00 | 68420.00 |
+|        BRUCE |   |      ADAMSON | M | 500.00 | 2022.00 | 55280.00 |
+|    ELIZABETH | R |       PIANKA | F | 400.00 | 1780.00 | 62250.00 |
+|    MASATOSHI | J |    YOSHIMURA | M | 500.00 | 1974.00 | 44680.00 |
+|      MARILYN | S |     SCOUTTEN | F | 500.00 | 1707.00 | 51340.00 |
+|        JAMES | H |       WALKER | M | 400.00 | 1636.00 | 50450.00 |
+|        DAVID |   |        BROWN | M | 600.00 | 2217.00 | 57740.00 |
+|      WILLIAM | T |        JONES | M | 400.00 | 1462.00 | 68270.00 |
+|     JENNIFER | K |         LUTZ | F | 600.00 | 2387.00 | 49840.00 |
+|        JAMES | J |    JEFFERSON | M | 400.00 | 1774.00 | 42180.00 |
+|    SALVATORE | M |       MARINO | M | 600.00 | 2301.00 | 48760.00 |
+|       DANIEL | S |        SMITH | M | 400.00 | 1534.00 | 49180.00 |
+|        SYBIL | P |      JOHNSON | F | 300.00 | 1380.00 | 47250.00 |
+|        MARIA | L |        PEREZ | F | 500.00 | 2190.00 | 37380.00 |
+|        ETHEL | R |    SCHNEIDER | F | 500.00 | 2100.00 | 36250.00 |
+|         JOHN | R |       PARKER | M | 300.00 | 1227.00 | 35340.00 |
+|       PHILIP | X |        SMITH | M | 400.00 | 1420.00 | 37750.00 |
+|        MAUDE | F |     SETRIGHT | F | 300.00 | 1272.00 | 35900.00 |
+|       RAMLAL | V |        MEHTA | M | 400.00 | 1596.00 | 39950.00 |
+|         WING |   |          LEE | M | 500.00 | 2030.00 | 45370.00 |
+|        JASON | R |       GOUNOT | M | 500.00 | 1907.00 | 43840.00 |
+|         DIAN | J |    HEMMINGER | F | 1000.00 | 4220.00 | 46500.00 |
+|         GREG |   |      ORLANDO | M | 600.00 | 2340.00 | 39250.00 |
+|          KIM | N |         NATZ | F | 600.00 | 2274.00 | 68420.00 |
+|      KIYOSHI |   |     YAMAMOTO | M | 500.00 | 1974.00 | 64680.00 |
+|         REBA | K |         JOHN | F | 600.00 | 2387.00 | 69840.00 |
+|       ROBERT | M |   MONTEVERDE | M | 600.00 | 2301.00 | 37760.00 |
+|       EILEEN | R |     SCHWARTZ | F | 500.00 | 2100.00 | 46250.00 |
+|     MICHELLE | F |     SPRINGER | F | 300.00 | 1272.00 | 35900.00 |
+|       HELENA |   |         WONG | F | 500.00 | 2030.00 | 35370.00 |
+|          ROY | R |       ALONZO | M | 500.00 | 1907.00 | 31840.00 |
+
+
+3. Display employee and department info.
+
+|      First Name |       Last Name |  Dept No |                      Dept Name |   Mgr No |
+|      ---------- |       --------- |  ------- |                      --------- |   ------ |
+|       CHRISTINE |            HAAS |      A00 |   SPIFFY COMPUTER SERVICE DIV. |   000010 |
+|            GREG |         ORLANDO |      A00 |   SPIFFY COMPUTER SERVICE DIV. |   000010 |
+|            DIAN |       HEMMINGER |      A00 |   SPIFFY COMPUTER SERVICE DIV. |   000010 |
+|            SEAN |       O'CONNELL |      A00 |   SPIFFY COMPUTER SERVICE DIV. |   000010 |
+|        VINCENZO |       LUCCHESSI |      A00 |   SPIFFY COMPUTER SERVICE DIV. |   000010 |
+|         MICHAEL |        THOMPSON |      B01 |                       PLANNING |   000020 |
+|           SALLY |            KWAN |      C01 |             INFORMATION CENTER |   000030 |
+|             KIM |            NATZ |      C01 |             INFORMATION CENTER |   000030 |
+|         HEATHER |        NICHOLLS |      C01 |             INFORMATION CENTER |   000030 |
+|         DELORES |        QUINTANA |      C01 |             INFORMATION CENTER |   000030 |
+|          IRVING |           STERN |      D11 |          MANUFACTURING SYSTEMS |   000060 |
+|            REBA |            JOHN |      D11 |          MANUFACTURING SYSTEMS |   000060 |
+|         KIYOSHI |        YAMAMOTO |      D11 |          MANUFACTURING SYSTEMS |   000060 |
+|        JENNIFER |            LUTZ |      D11 |          MANUFACTURING SYSTEMS |   000060 |
+|         WILLIAM |           JONES |      D11 |          MANUFACTURING SYSTEMS |   000060 |
+|           DAVID |           BROWN |      D11 |          MANUFACTURING SYSTEMS |   000060 |
+|           JAMES |          WALKER |      D11 |          MANUFACTURING SYSTEMS |   000060 |
+|         MARILYN |        SCOUTTEN |      D11 |          MANUFACTURING SYSTEMS |   000060 |
+|       MASATOSHI |       YOSHIMURA |      D11 |          MANUFACTURING SYSTEMS |   000060 |
+|       ELIZABETH |          PIANKA |      D11 |          MANUFACTURING SYSTEMS |   000060 |
+|           BRUCE |         ADAMSON |      D11 |          MANUFACTURING SYSTEMS |   000060 |
+|             EVA |         PULASKI |      D21 |         ADMINISTRATION SYSTEMS |   000070 |
+|          ROBERT |      MONTEVERDE |      D21 |         ADMINISTRATION SYSTEMS |   000070 |
+|           MARIA |           PEREZ |      D21 |         ADMINISTRATION SYSTEMS |   000070 |
+|           SYBIL |         JOHNSON |      D21 |         ADMINISTRATION SYSTEMS |   000070 |
+|          DANIEL |           SMITH |      D21 |         ADMINISTRATION SYSTEMS |   000070 |
+|       SALVATORE |          MARINO |      D21 |         ADMINISTRATION SYSTEMS |   000070 |
+|           JAMES |       JEFFERSON |      D21 |         ADMINISTRATION SYSTEMS |   000070 |
+|            JOHN |           GEYER |      E01 |               SUPPORT SERVICES |   000050 |
+|          EILEEN |       HENDERSON |      E11 |                     OPERATIONS |   000090 |
+|        MICHELLE |        SPRINGER |      E11 |                     OPERATIONS |   000090 |
+|          EILEEN |        SCHWARTZ |      E11 |                     OPERATIONS |   000090 |
+|           MAUDE |        SETRIGHT |      E11 |                     OPERATIONS |   000090 |
+|          PHILIP |           SMITH |      E11 |                     OPERATIONS |   000090 |
+|            JOHN |          PARKER |      E11 |                     OPERATIONS |   000090 |
+|           ETHEL |       SCHNEIDER |      E11 |                     OPERATIONS |   000090 |
+|        THEODORE |         SPENSER |      E21 |               SOFTWARE SUPPORT |   000100 |
+|             ROY |          ALONZO |      E21 |               SOFTWARE SUPPORT |   000100 |
+|          HELENA |            WONG |      E21 |               SOFTWARE SUPPORT |   000100 |
+|           JASON |          GOUNOT |      E21 |               SOFTWARE SUPPORT |   000100 |
+|            WING |             LEE |      E21 |               SOFTWARE SUPPORT |   000100 |
+|          RAMLAL |           MEHTA |      E21 |               SOFTWARE SUPPORT |   000100 |
+
+
+[db2inst1@2ebcc1c6fbf6 workspace]$ exit
+logout
+root@pop-os:/home/wannab/Documents/Code/CS257-HW3# exit
+exit
+wannab@pop-os:~/Documents/Code/CS257-HW3$
